@@ -349,6 +349,20 @@ class AdmissionProcess(models.Model):
         self.state = 'done'
         self.closed_date = fields.Date.context_today(self)
         self.message_post(body=_('Admisión completada. Residente activado en el sistema.'))
+        if self.resident_id:
+            nursing_fields = {
+                'allergies': self.allergies,
+                'current_medications': self.current_medications,
+                'nursing_notes': self.nursing_notes,
+                'test_alcohol': self.test_alcohol,
+                'test_alcohol_result': self.test_alcohol_result,
+                'test_drugs': self.test_drugs,
+                'test_drugs_result': self.test_drugs_result,
+            }
+            resident_fnames = self.resident_id._fields
+            vals = {k: v for k, v in nursing_fields.items() if k in resident_fnames and v}
+            if vals:
+                self.resident_id.write(vals)
         if self.resident_id and 'cs.piai' in self.env:
             existing = self.env['cs.piai'].search([
                 ('resident_id', '=', self.resident_id.id),
