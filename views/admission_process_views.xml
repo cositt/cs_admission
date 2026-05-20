@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ── VISTA LISTA ──────────────────────────────────────────────── -->
+    <record id="admission_process_list_view" model="ir.ui.view">
+        <field name="name">cs.admission.process.list</field>
+        <field name="model">cs.admission.process</field>
+        <field name="arch" type="xml">
+            <list string="Procesos de Admisión"
+                  decoration-success="state == 'done'"
+                  decoration-muted="state == 'draft'">
+                <field name="name"/>
+                <field name="full_name"/>
+                <field name="admission_date"/>
+                <field name="residence_id"/>
+                <field name="resident_id"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-warning="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ── VISTA FORMULARIO ─────────────────────────────────────────── -->
+    <record id="admission_process_form_view" model="ir.ui.view">
+        <field name="name">cs.admission.process.form</field>
+        <field name="model">cs.admission.process</field>
+        <field name="arch" type="xml">
+            <form string="Proceso de Admisión">
+                <header>
+                    <!-- Navegación -->
+                    <button name="action_next_step"
+                            string="Siguiente paso →"
+                            type="object"
+                            class="btn-primary"
+                            invisible="state in ('economy', 'done')"/>
+                    <button name="action_complete_admission"
+                            string="✓ Completar Admisión"
+                            type="object"
+                            class="btn-success"
+                            invisible="state != 'economy'"/>
+                    <button name="action_prev_step"
+                            string="← Paso anterior"
+                            type="object"
+                            invisible="state in ('draft', 'done')"/>
+
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,rooming,medical,psych,nursing,docs,economy,done"/>
+                </header>
+
+                <sheet>
+                    <!-- Smart buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_resident"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-user"
+                                invisible="not resident_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Residente</span>
+                            </div>
+                        </button>
+                        <button name="action_open_medical"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-stethoscope"
+                                invisible="not medical_consultation_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Consulta Médica</span>
+                            </div>
+                        </button>
+                        <button name="action_create_initial_assessment"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-heartbeat"
+                                invisible="not initial_assessment_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Evaluación Psic.</span>
+                            </div>
+                        </button>
+                        <button name="action_create_wallet"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-credit-card"
+                                invisible="not wallet_id">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Monedero</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="admission_date"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="resident_id" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+
+                        <!-- ── PASO 1: IDENTIFICACIÓN ──────────────── -->
+                        <page string="1 · Identificación" name="identification">
+                            <group string="Datos del paciente">
+                                <group>
+                                    <field name="full_name"
+                                           placeholder="Nombre y apellidos completos"
+                                           readonly="state != 'draft'"/>
+                                    <field name="dni"
+                                           placeholder="12345678A"
+                                           readonly="state != 'draft'"/>
+                                    <field name="fecha_nacimiento"
+                                           readonly="state != 'draft'"/>
+                                </group>
+                                <group>
+                                    <field name="phone" readonly="state != 'draft'"/>
+                                    <field name="email_contact" readonly="state != 'draft'"/>
+                                </group>
+                            </group>
+                            <group string="Tutor legal / Familiar responsable">
+                                <group>
+                                    <field name="guardian_name"
+                                           placeholder="Nombre del tutor o familiar"
+                                           readonly="state != 'draft'"/>
+                                    <field name="guardian_phone" readonly="state != 'draft'"/>
+                                </group>
+                                <group>
+                                    <field name="guardian_email" readonly="state != 'draft'"/>
+                                </group>
+                            </group>
+                            <group string="Notas">
+                                <field name="identification_notes"
+                                       nolabel="1"
+                                       placeholder="Observaciones relevantes del proceso de identificación…"
+                                       readonly="state != 'draft'"/>
+                            </group>
+                            <div class="alert alert-info" role="alert" invisible="resident_id">
+                                Al pulsar <strong>Siguiente paso</strong> se creará automáticamente
+                                el residente y su contacto en el sistema.
+                            </div>
+                            <div class="alert alert-success" role="alert" invisible="not resident_id">
+                                Residente creado: <field name="resident_id" readonly="1" nolabel="1"/>
+                            </div>
+                        </page>
+
+                        <!-- ── PASO 2: UBICACIÓN ───────────────────── -->
+                        <page string="2 · Ubicación" name="rooming">
+                            <group string="Asignación de espacio">
+                                <group>
+                                    <field name="residence_id"
+                                           readonly="state not in ('rooming',)"/>
+                                    <field name="room_id"
+                                           readonly="state not in ('rooming',)"/>
+                                </group>
+                            </group>
+                            <div class="alert alert-info" role="alert"
+                                 invisible="state != 'rooming'">
+                                La residencia y habitación se asignarán al residente al pulsar
+                                <strong>Siguiente paso</strong>.
+                            </div>
+                        </page>
+
+                        <!-- ── PASO 3: MÉDICO ──────────────────────── -->
+                        <page string="3 · Médico" name="medical">
+                            <group string="Consulta de ingreso">
+                                <field name="medical_consultation_id"
+                                       options="{'no_quick_create': False}"
+                                       readonly="state not in ('medical',)"/>
+                            </group>
+                            <div class="mt-2" invisible="state != 'medical'">
+                                <button name="action_new_medical_consultation"
+                                        string="Nueva consulta de ingreso"
+                                        type="object"
+                                        class="btn btn-secondary"
+                                        invisible="medical_consultation_id"/>
+                            </div>
+                            <div class="alert alert-info" role="alert"
+                                 invisible="state != 'medical' or medical_consultation_id">
+                                Este paso es opcional — puede avanzar sin consulta de ingreso.
+                            </div>
+                        </page>
+
+                        <!-- ── PASO 4: PSICOLOGÍA ──────────────────── -->
+                        <page string="4 · Psicología" name="psych">
+                            <group string="Evaluación inicial">
+                                <field name="initial_assessment_id"
+                                       options="{'no_quick_create': True}"
+                                       readonly="state not in ('psych',)"/>
+                            </group>
+                            <div class="mt-2" invisible="state != 'psych'">
+                                <button name="action_create_initial_assessment"
+                                        string="Crear evaluación psicológica inicial"
+                                        type="object"
+                                        class="btn btn-secondary"
+                                        invisible="initial_assessment_id"/>
+                                <button name="action_create_initial_assessment"
+                                        string="Abrir evaluación"
+                                        type="object"
+                                        class="btn btn-secondary"
+                                        invisible="not initial_assessment_id"/>
+                            </div>
+                            <div class="alert alert-info" role="alert"
+                                 invisible="state != 'psych'">
+                                Se creará una evaluación psicológica inicial vinculada al residente.
+                                Complete los campos clínicos dentro del formulario de evaluación.
+                            </div>
+                        </page>
+
+                        <!-- ── PASO 5: ENFERMERÍA ──────────────────── -->
+                        <page string="5 · Enfermería" name="nursing">
+                            <group string="Condición al ingreso">
+                                <group>
+                                    <field name="allergies"
+                                           placeholder="Ninguna conocida / lista de alergias"
+                                           readonly="state not in ('nursing',)"/>
+                                    <field name="current_medications"
+                                           placeholder="Medicación que toma actualmente"
+                                           readonly="state not in ('nursing',)"/>
+                                </group>
+                            </group>
+                            <group string="Tests al ingreso">
+                                <group>
+                                    <field name="test_alcohol"
+                                           readonly="state not in ('nursing',)"/>
+                                    <field name="test_alcohol_result"
+                                           invisible="not test_alcohol"
+                                           readonly="state not in ('nursing',)"
+                                           placeholder="Resultado / valor"/>
+                                    <field name="test_drugs"
+                                           readonly="state not in ('nursing',)"/>
+                                    <field name="test_drugs_result"
+                                           invisible="not test_drugs"
+                                           readonly="state not in ('nursing',)"
+                                           placeholder="Resultado / valor"/>
+                                </group>
+                            </group>
+                            <group string="Notas de enfermería">
+                                <field name="nursing_notes"
+                                       nolabel="1"
+                                       placeholder="Observaciones clínicas, constantes, estado general…"
+                                       readonly="state not in ('nursing',)"/>
+                            </group>
+                        </page>
+
+                        <!-- ── PASO 6: DOCUMENTACIÓN ───────────────── -->
+                        <page string="6 · Documentación" name="docs">
+                            <group string="Checklist de documentos">
+                                <group>
+                                    <field name="doc_id_provided"
+                                           readonly="state not in ('docs',)"/>
+                                    <field name="doc_contract_signed"
+                                           readonly="state not in ('docs',)"/>
+                                </group>
+                                <group>
+                                    <field name="doc_medical_report"
+                                           readonly="state not in ('docs',)"/>
+                                    <field name="doc_consent_signed"
+                                           readonly="state not in ('docs',)"/>
+                                </group>
+                            </group>
+                            <group string="Archivos adjuntos">
+                                <field name="attachment_ids"
+                                       nolabel="1"
+                                       widget="many2many_binary"
+                                       readonly="state not in ('docs',)"/>
+                            </group>
+                        </page>
+
+                        <!-- ── PASO 7: ECONOMÍA ────────────────────── -->
+                        <page string="7 · Economía" name="economy">
+                            <group string="Cartera del paciente">
+                                <field name="wallet_id"
+                                       options="{'no_quick_create': True}"
+                                       readonly="state not in ('economy',)"/>
+                            </group>
+                            <div class="mt-2" invisible="state != 'economy'">
+                                <button name="action_create_wallet"
+                                        string="Crear monedero"
+                                        type="object"
+                                        class="btn btn-secondary"
+                                        invisible="wallet_id"/>
+                                <button name="action_create_wallet"
+                                        string="Abrir monedero"
+                                        type="object"
+                                        class="btn btn-secondary"
+                                        invisible="not wallet_id"/>
+                            </div>
+                            <div class="alert alert-info" role="alert"
+                                 invisible="state != 'economy'">
+                                Cree el monedero del paciente para registrar gastos de suplidos
+                                (farmacia, tienda, taxi, etc.) y configurar alertas a la familia.
+                            </div>
+                        </page>
+
+                        <!-- ── PASO 8: CIERRE ──────────────────────── -->
+                        <page string="8 · Cierre" name="done">
+                            <group string="Resumen de la admisión" invisible="state != 'done'">
+                                <group>
+                                    <field name="resident_id" readonly="1"/>
+                                    <field name="residence_id" readonly="1"/>
+                                    <field name="room_id" readonly="1"/>
+                                    <field name="closed_date" readonly="1"/>
+                                </group>
+                                <group>
+                                    <field name="medical_consultation_id" readonly="1"/>
+                                    <field name="initial_assessment_id" readonly="1"/>
+                                    <field name="wallet_id" readonly="1"/>
+                                </group>
+                            </group>
+                            <group string="Notas de cierre">
+                                <field name="closing_notes"
+                                       nolabel="1"
+                                       placeholder="Observaciones finales del proceso de admisión…"
+                                       readonly="state == 'done'"/>
+                            </group>
+                            <div class="alert alert-warning" role="alert"
+                                 invisible="state == 'done'">
+                                Complete el paso de Economía y pulse
+                                <strong>✓ Completar Admisión</strong> para finalizar el proceso.
+                            </div>
+                            <div class="alert alert-success" role="alert"
+                                 invisible="state != 'done'">
+                                Admisión completada el <field name="closed_date" readonly="1" nolabel="1"/>.
+                                El residente está activo en el sistema.
+                            </div>
+                        </page>
+
+                    </notebook>
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ── VISTA BÚSQUEDA ──────────────────────────────────────────── -->
+    <record id="admission_process_search_view" model="ir.ui.view">
+        <field name="name">cs.admission.process.search</field>
+        <field name="model">cs.admission.process</field>
+        <field name="arch" type="xml">
+            <search string="Buscar admisiones">
+                <field name="name"/>
+                <field name="full_name"/>
+                <field name="dni"/>
+                <field name="resident_id"/>
+                <field name="residence_id"/>
+                <separator/>
+                <filter name="in_progress" string="En curso"
+                        domain="[('state', '!=', 'done')]"/>
+                <filter name="done" string="Cerradas"
+                        domain="[('state', '=', 'done')]"/>
+                <separator/>
+                <filter name="group_state" string="Paso" context="{'group_by': 'state'}"/>
+                <filter name="group_residence" string="Residencia" context="{'group_by': 'residence_id'}"/>
+                <filter name="group_date" string="Fecha de ingreso" context="{'group_by': 'admission_date'}"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ── ACCIÓN ───────────────────────────────────────────────────── -->
+    <record id="admission_process_action" model="ir.actions.act_window">
+        <field name="name">Admisiones</field>
+        <field name="res_model">cs.admission.process</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="admission_process_search_view"/>
+        <field name="context">{'search_default_in_progress': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Iniciar nueva admisión
+            </p>
+            <p>
+                El asistente guiará paso a paso el proceso de ingreso de un nuevo residente:
+                identificación, ubicación, atención médica y psicológica, documentación y economía.
+            </p>
+        </field>
+    </record>
+
+</odoo>
