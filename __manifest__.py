@@ -1,6 +1,6 @@
 {
     'name': 'Centro Sanitario - Admisión',
-    'version': '1.0.0',
+    'version': '1.1.0',
     'category': 'Healthcare',
     'summary': 'Asistente guiado de admisión de residentes para Equilibrium',
     'author': 'Equilibrium Dev Team',
@@ -11,6 +11,7 @@
         'cs_psicology',
         'cs_purse_pocket',
         'cs_patient_followup',
+        'cs_dni_ocr',
     ],
     'data': [
         'security/ir.model.access.csv',

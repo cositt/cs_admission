@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_cs_admission_process_user,access_cs_admission_process_user,model_cs_admission_process,base.group_user,1,1,1,0
 access_cs_admission_process_admin,access_cs_admission_process_admin,model_cs_admission_process,base.group_system,1,1,1,1
+access_cs_admission_guardian_user,access_cs_admission_guardian_user,model_cs_admission_guardian,base.group_user,1,1,1,1
+access_cs_admission_guardian_admin,access_cs_admission_guardian_admin,model_cs_admission_guardian,base.group_system,1,1,1,1
