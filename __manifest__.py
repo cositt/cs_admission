@@ -8,9 +8,9 @@
     'depends': [
         'cs_resident',
         'cs_medical_care',
-        'cs_psychology',
+        'cs_psicology',
         'cs_purse_pocket',
-        'cs_patient_followup_forms',
+        'cs_patient_followup',
     ],
     'data': [
         'security/ir.model.access.csv',
