@@ -123,6 +123,10 @@
                                            readonly="state != 'draft'"/>
                                     <field name="fecha_nacimiento"
                                            readonly="state != 'draft'"/>
+                                    <field name="street"
+                                           readonly="state != 'draft'"/>
+                                    <field name="city"
+                                           readonly="state != 'draft'"/>
                                 </group>
                                 <group>
                                     <field name="phone" readonly="state != 'draft'"/>
@@ -179,8 +183,8 @@
                                         <field name="partner_id" optional="show"/>
                                         <field name="name"/>
                                         <field name="dni"/>
-                                        <field name="street" optional="hide"/>
-                                        <field name="city" optional="hide"/>
+                                        <field name="street" string="Dirección"/>
+                                        <field name="city" string="Localidad"/>
                                         <field name="zip" optional="hide"/>
                                         <field name="phone"/>
                                         <field name="email"/>
@@ -213,8 +217,8 @@
                                             <field name="relationship"/>
                                         </group>
                                         <group>
-                                            <field name="street"/>
-                                            <field name="city"/>
+                                            <field name="street" string="Dirección"/>
+                                            <field name="city" string="Localidad"/>
                                             <field name="zip"/>
                                             <field name="country_id"/>
                                         </group>
@@ -504,6 +508,12 @@
                         <field name="partner_id"/>
                         <field name="dni"/>
                         <field name="relationship"/>
+                    </group>
+                    <group>
+                        <field name="street" string="Dirección"/>
+                        <field name="city" string="Localidad"/>
+                        <field name="zip"/>
+                        <field name="country_id"/>
                     </group>
                     <group string="Imágenes DNI">
                         <field name="ocr_front_image" filename="ocr_front_filename"/>

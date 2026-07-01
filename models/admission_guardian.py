@@ -28,7 +28,7 @@ class CsAdmissionGuardian(models.Model):
     )
     dni = fields.Char(string="DNI / NIE")
     street = fields.Char(string="Dirección")
-    city = fields.Char(string="Ciudad")
+    city = fields.Char(string="Localidad")
     zip = fields.Char(string="CP")
     country_id = fields.Many2one(
         "res.country",

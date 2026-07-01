@@ -63,6 +63,8 @@ class AdmissionProcess(models.Model):
     full_name = fields.Char(string='Nombre completo', tracking=True)
     dni = fields.Char(string='DNI / NIF', tracking=True)
     fecha_nacimiento = fields.Date(string='Fecha de nacimiento')
+    street = fields.Char(string='Dirección', tracking=True)
+    city = fields.Char(string='Localidad', tracking=True)
     phone = fields.Char(string='Teléfono')
     email_contact = fields.Char(string='Email')
     identification_notes = fields.Text(string='Notas de identificación')
@@ -182,6 +184,8 @@ class AdmissionProcess(models.Model):
         partner = self.patient_partner_id
         self.full_name = partner.name or self.full_name
         self.dni = partner.vat or partner.ref or self.dni
+        self.street = partner.street or self.street
+        self.city = partner.city or self.city
         self.phone = partner.phone or partner.mobile or self.phone
         self.email_contact = partner.email or self.email_contact
         existing_resident = self.env['cs.resident'].search([
@@ -205,6 +209,10 @@ class AdmissionProcess(models.Model):
             vals['full_name'] = result['full_name']
         if result.get('birth_date'):
             vals['fecha_nacimiento'] = result['birth_date']
+        if result.get('street'):
+            vals['street'] = result['street']
+        if result.get('city'):
+            vals['city'] = result['city']
         self.write(vals)
 
     def _ocr_reload_form_action(self, title, message, msg_type='warning'):
@@ -236,6 +244,10 @@ class AdmissionProcess(models.Model):
                 parts.append(_('Nombre: %s') % result['full_name'])
             if result.get('birth_date'):
                 parts.append(_('Nacimiento: %s') % result['birth_date'])
+            if result.get('street'):
+                parts.append(_('Dirección: %s') % result['street'])
+            if result.get('city'):
+                parts.append(_('Localidad: %s') % result['city'])
             parts.append(_('DNI no detectado. Escríbalo y pulse «Confirmar DNI».'))
             message = ' · '.join(parts)
             msg_type = 'warning'
@@ -423,6 +435,10 @@ class AdmissionProcess(models.Model):
                 partner_vals['name'] = self.full_name
             if self.dni and partner.vat != self.dni:
                 partner_vals['vat'] = self.dni
+            if self.street:
+                partner_vals['street'] = self.street
+            if self.city:
+                partner_vals['city'] = self.city
             if self.phone:
                 partner_vals['phone'] = self.phone
             if self.email_contact:
@@ -436,6 +452,8 @@ class AdmissionProcess(models.Model):
         return self.env['res.partner'].create({
             'name': self.full_name,
             'vat': self.dni,
+            'street': self.street or False,
+            'city': self.city or False,
             'phone': self.phone or '',
             'email': self.email_contact or '',
             'category_id': [(4, patient_category.id)],
