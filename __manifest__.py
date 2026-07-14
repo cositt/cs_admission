@@ -1,6 +1,6 @@
 {
     'name': 'Centro Sanitario - Admisión',
-    'version': '1.1.0',
+    'version': '1.1.1',
     'category': 'Healthcare',
     'summary': 'Asistente guiado de admisión de residentes para Equilibrium',
     'author': 'Equilibrium Dev Team',

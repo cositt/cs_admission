@@ -63,6 +63,8 @@ class AdmissionProcess(models.Model):
     full_name = fields.Char(string='Nombre completo', tracking=True)
     dni = fields.Char(string='DNI / NIF', tracking=True)
     fecha_nacimiento = fields.Date(string='Fecha de nacimiento')
+    edad = fields.Integer(string='Edad', compute='_compute_edad', store=False)
+    es_menor = fields.Boolean(string='Es menor de edad', compute='_compute_edad', store=False)
     street = fields.Char(string='Dirección', tracking=True)
     city = fields.Char(string='Localidad', tracking=True)
     phone = fields.Char(string='Teléfono')
@@ -176,6 +178,20 @@ class AdmissionProcess(models.Model):
     closed_date = fields.Date(string='Fecha de cierre', readonly=True)
 
     # ── Navegación ─────────────────────────────────────────────────────
+
+    @api.depends('fecha_nacimiento')
+    def _compute_edad(self):
+        for admision in self:
+            if admision.fecha_nacimiento:
+                hoy = fields.Date.context_today(admision)
+                edad = hoy.year - admision.fecha_nacimiento.year
+                if (hoy.month, hoy.day) < (admision.fecha_nacimiento.month, admision.fecha_nacimiento.day):
+                    edad -= 1
+                admision.edad = edad
+                admision.es_menor = edad < 18
+            else:
+                admision.edad = 0
+                admision.es_menor = False
 
     @api.onchange('patient_partner_id')
     def _onchange_patient_partner_id(self):

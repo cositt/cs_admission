@@ -123,15 +123,27 @@
                                            readonly="state != 'draft'"/>
                                     <field name="fecha_nacimiento"
                                            readonly="state != 'draft'"/>
-                                    <field name="street"
-                                           readonly="state != 'draft'"/>
-                                    <field name="city"
-                                           readonly="state != 'draft'"/>
+                                    <field name="edad" readonly="1"/>
                                 </group>
                                 <group>
                                     <field name="phone" readonly="state != 'draft'"/>
                                     <field name="email_contact" readonly="state != 'draft'"/>
                                     <field name="patient_ocr_state" readonly="1"/>
+                                </group>
+                            </group>
+                            <div class="alert alert-warning" role="alert" invisible="not es_menor">
+                                ⚠ Paciente menor de edad — requiere <strong>contrato de menor</strong>.
+                            </div>
+                            <group string="Domicilio del paciente">
+                                <group>
+                                    <field name="street"
+                                           string="Domicilio"
+                                           placeholder="Calle, número, piso..."
+                                           readonly="state != 'draft'"/>
+                                    <field name="city"
+                                           string="Localidad"
+                                           placeholder="Ciudad o municipio"
+                                           readonly="state != 'draft'"/>
                                 </group>
                             </group>
                             <group string="OCR DNI paciente" invisible="state != 'draft'">
@@ -183,8 +195,8 @@
                                         <field name="partner_id" optional="show"/>
                                         <field name="name"/>
                                         <field name="dni"/>
-                                        <field name="street" string="Dirección"/>
-                                        <field name="city" string="Localidad"/>
+                                        <field name="street" string="Domicilio" optional="show"/>
+                                        <field name="city" string="Localidad" optional="show"/>
                                         <field name="zip" optional="hide"/>
                                         <field name="phone"/>
                                         <field name="email"/>
