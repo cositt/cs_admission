@@ -112,7 +112,7 @@ class CsAdmissionGuardian(models.Model):
         self.city = partner.city or self.city
         self.zip = partner.zip or self.zip
         self.country_id = partner.country_id or self.country_id
-        self.phone = partner.phone or partner.mobile or self.phone
+        self.phone = partner.phone or self.phone
         self.email = partner.email or self.email
         bank = partner.bank_ids[:1]
         if bank:

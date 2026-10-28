@@ -202,7 +202,7 @@ class AdmissionProcess(models.Model):
         self.dni = partner.vat or partner.ref or self.dni
         self.street = partner.street or self.street
         self.city = partner.city or self.city
-        self.phone = partner.phone or partner.mobile or self.phone
+        self.phone = partner.phone or self.phone
         self.email_contact = partner.email or self.email_contact
         existing_resident = self.env['cs.resident'].search([
             ('partner_id', '=', partner.id),
