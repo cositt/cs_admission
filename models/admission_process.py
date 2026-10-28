@@ -120,6 +120,19 @@ class AdmissionProcess(models.Model):
         tracking=True,
     )
     residence_id = fields.Many2one('cs.residence', string='Residencia', tracking=True)
+
+    # Condiciones del contrato: se guardan en el residente
+    currency_id = fields.Many2one(related='resident_id.currency_id')
+    precio_mensual = fields.Monetary(
+        related='resident_id.precio_mensual', currency_field='currency_id', readonly=False,
+    )
+    dia_cobro = fields.Integer(related='resident_id.dia_cobro', readonly=False)
+    banco = fields.Char(related='resident_id.banco', readonly=False)
+    fecha_salida_prevista = fields.Date(
+        related='resident_id.fecha_salida_prevista', readonly=False,
+    )
+    otro_alcance = fields.Text(related='resident_id.otro_alcance', readonly=False)
+    contact_ids = fields.One2many(related='resident_id.contact_ids', readonly=False)
     room_id = fields.Many2one(
         'cs.room',
         string='Habitación',

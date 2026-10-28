@@ -417,6 +417,32 @@
 
                         <!-- ── PASO 7: ECONOMÍA ────────────────────── -->
                         <page string="7 · Economía" name="economy">
+                            <group string="Condiciones del contrato"
+                                   invisible="not resident_id">
+                                <field name="currency_id" invisible="1"/>
+                                <field name="precio_mensual" readonly="state == 'done'"/>
+                                <field name="dia_cobro" readonly="state == 'done'"/>
+                                <field name="banco" readonly="state == 'done'"/>
+                                <field name="fecha_salida_prevista" readonly="state == 'done'"/>
+                                <field name="otro_alcance" readonly="state == 'done'"/>
+                            </group>
+                            <group string="Personas del contrato (representante legal, apoyo, contactos, titular de la cuenta)"
+                                   col="1" invisible="not resident_id">
+                                <field name="contact_ids" nolabel="1" readonly="state == 'done'">
+                                    <list editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="role"/>
+                                        <field name="name"/>
+                                        <field name="dni"/>
+                                        <field name="street"/>
+                                        <field name="city"/>
+                                        <field name="relationship"/>
+                                        <field name="phone"/>
+                                        <field name="email"/>
+                                        <field name="iban" string="IBAN (solo titular)"/>
+                                    </list>
+                                </field>
+                            </group>
                             <group string="Cartera del paciente">
                                 <field name="wallet_id"
                                        options="{'no_quick_create': True}"
