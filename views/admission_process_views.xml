@@ -439,6 +439,7 @@
                                         <field name="relationship"/>
                                         <field name="phone"/>
                                         <field name="email"/>
+                                        <field name="info_authorized" string="Autorizado info." widget="boolean_toggle"/>
                                         <field name="iban" string="IBAN (solo titular)"/>
                                     </list>
                                 </field>
